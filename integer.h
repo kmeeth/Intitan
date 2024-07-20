@@ -10,7 +10,10 @@ namespace int_titan
     class integer
     {
     public:
-        using integer_digits = immer::vector<uint32_t>;
+        using digit = uint32_t;
+        using superdigit = uint64_t;
+        static constexpr digit max_digit = std::numeric_limits<digit>::max();
+        using integer_digits = immer::vector<digit>;
         // Constructors.
         explicit integer(integer_digits digits, const bool is_negative)
             :digits(std::move(digits)), is_negative(is_negative)
@@ -23,13 +26,29 @@ namespace int_titan
             return x;
         }
         // Add the two integers.
-        static integer add(integer x, integer y)
+        static integer add(const integer& x, const integer& y)
         {
+            // Cover the cases for negative numbers.
+            // -x + (-y) = -(x + y)
+            if(x.is_negative and y.is_negative)
+            {
+                return negate(add(negate(x), negate(y)));
+            }
+            // -x + y = y - x
+            else if(x.is_negative and !y.is_negative)
+            {
+                return sub(y, negate(x));
+            }
+            // x + (-y) = x - y
+            else if(!x.is_negative and y.is_negative)
+            {
+                return sub(x, negate(y));
+            }
             auto result = integer_digits().transient();
             int carry = 0;
             for(int i = 0; i < std::max(x.digits.size(), y.digits.size()); i++)
             {
-                uint32_t sum = get_digit(x, i) + get_digit(y, i) + carry;
+                digit sum = get_digit(x, i) + get_digit(y, i) + carry;
                 carry = sum < get_digit(x, i) ? 1 : 0; // Check for integer overflow.
                 result.push_back(sum);
             }
@@ -39,16 +58,26 @@ namespace int_titan
             }
             return integer(result.persistent(), false);
         }
+        // Sub one integer from the other.
+        static integer sub(const integer& x, const integer& y)
+        {
+            return integer(0, false);
+        }
     private:
         // A vector of base-2^32 digits (little-endian).
         integer_digits digits;
         // Is the integer negative?
         bool is_negative;
         // Get a digit from an integer.
-        static uint32_t get_digit(const integer& x, const int index)
+        static digit get_digit(const integer& x, const int index)
         {
             // Return the digit's value if present, else return 0 as a leading zero.
             return index < x.digits.size() ? x.digits[index] : 0;
+        }
+        // Get an inverse digit of a digit (the one with which it adds up to 10 base 2^32).
+        static digit inverse_digit(const digit digit)
+        {
+            return static_cast<superdigit>(max_digit) + 1 - digit;
         }
     };
 }
