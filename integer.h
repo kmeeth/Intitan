@@ -63,32 +63,32 @@ namespace int_titan
         {
             // Cover the case where x is less than y.
             // x - y = -(y - x)
-            if(is_less_than(x, y))
+            if (is_less_than(x, y))
             {
                 return negate(sub(y, x));
             }
             // Cover the cases for negative numbers.
             // -x - (-y) = y - x
-            if(x.is_negative and y.is_negative)
+            if (x.is_negative and y.is_negative)
             {
                 return negate(sub(negate(y), negate(x)));
             }
-            // -x - y = -(x + y)
-            else if(x.is_negative and !y.is_negative)
+                // -x - y = -(x + y)
+            else if (x.is_negative and !y.is_negative)
             {
                 return negate(add(negate(x), y));
             }
-            // x - (-y) = x + y
-            else if(!x.is_negative and y.is_negative)
+                // x - (-y) = x + y
+            else if (!x.is_negative and y.is_negative)
             {
                 return add(x, negate(y));
             }
             auto result = integer_digits().transient();
             int borrow = 0;
-            for(int i = 0; i < std::max(x.digits.size(), y.digits.size()); i++)
+            for (int i = 0; i < std::max(x.digits.size(), y.digits.size()); i++)
             {
                 digit diff;
-                if(get_digit(x, i) - borrow >= get_digit(y, i)) // No underflow.
+                if (get_digit(x, i) - borrow >= get_digit(y, i)) // No underflow.
                 {
                     diff = get_digit(x, i) - borrow - get_digit(y, i);
                     borrow = 0;
@@ -100,6 +100,28 @@ namespace int_titan
                 }
                 result.push_back(diff);
             }
+            // Remove leading 0s.
+            while (!result.empty() and result[result.size() - 1] == 0)
+            {
+                result.take(result.size() - 1);
+            }
+            return integer(result.persistent(), false);
+        }
+        // Is x less than y?
+        static bool is_less_than(const integer& x, const integer& y)
+        {
+            if(x.digits.size() != y.digits.size())
+            {
+                return x.digits.size() < y.digits.size();
+            }
+            for(int i = static_cast<int>(x.digits.size() - 1); i >= 0; i--)
+            {
+                if(get_digit(x, i) != get_digit(y, i))
+                {
+                    return get_digit(x, i) < get_digit(y, i);
+                }
+            }
+            return false;
         }
     private:
         // A vector of base-2^32 digits (little-endian).
