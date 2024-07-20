@@ -37,7 +37,7 @@ namespace int_titan
             {
                 result.push_back(1);
             }
-            return integer(result.persistent());
+            return integer(result.persistent(), false);
         }
     private:
         // A vector of base-2^32 digits (little-endian).
