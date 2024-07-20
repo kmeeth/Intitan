@@ -61,7 +61,45 @@ namespace int_titan
         // Sub one integer from the other.
         static integer sub(const integer& x, const integer& y)
         {
-            return integer(0, false);
+            // Cover the case where x is less than y.
+            // x - y = -(y - x)
+            if(is_less_than(x, y))
+            {
+                return negate(sub(y, x));
+            }
+            // Cover the cases for negative numbers.
+            // -x - (-y) = y - x
+            if(x.is_negative and y.is_negative)
+            {
+                return negate(sub(negate(y), negate(x)));
+            }
+            // -x - y = -(x + y)
+            else if(x.is_negative and !y.is_negative)
+            {
+                return negate(add(negate(x), y));
+            }
+            // x - (-y) = x + y
+            else if(!x.is_negative and y.is_negative)
+            {
+                return add(x, negate(y));
+            }
+            auto result = integer_digits().transient();
+            int borrow = 0;
+            for(int i = 0; i < std::max(x.digits.size(), y.digits.size()); i++)
+            {
+                digit diff;
+                if(get_digit(x, i) - borrow >= get_digit(y, i)) // No underflow.
+                {
+                    diff = get_digit(x, i) - borrow - get_digit(y, i);
+                    borrow = 0;
+                }
+                else // Underflow. Borrow set to 1 and inverse digit applied.
+                {
+                    diff = inverse_digit(get_digit(y, i) - (get_digit(x, i) - borrow));
+                    borrow = 1;
+                }
+                result.push_back(diff);
+            }
         }
     private:
         // A vector of base-2^32 digits (little-endian).
