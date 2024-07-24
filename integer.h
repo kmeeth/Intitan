@@ -15,9 +15,17 @@ namespace int_titan
         static constexpr digit max_digit = std::numeric_limits<digit>::max();
         using integer_digits = immer::vector<digit>;
         // Constructors.
+        integer(const integer&) = default;
+        integer(integer&&) = default;
+        // From base 2^32 digits (native representation).
         explicit integer(integer_digits digits, const bool is_negative)
             :digits(std::move(digits)), is_negative(is_negative)
         {
+        }
+        // From string representation in an arbitrary base.
+        explicit integer(std::string_view string, const int base = 10)
+        {
+            // TODO
         }
         // Negate the integer.
         static integer negate(integer x)
