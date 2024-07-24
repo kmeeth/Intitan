@@ -137,6 +137,7 @@ namespace int_titan
         // Get an inverse digit of a digit (the one with which it adds up to 10 base 2^32).
         static digit inverse_digit(const digit digit)
         {
+            assert(digit != 0); // 0 does not have an inverse.
             return static_cast<superdigit>(max_digit) + 1 - digit;
         }
     };
