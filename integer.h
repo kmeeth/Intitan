@@ -73,12 +73,12 @@ namespace int_titan
             {
                 return negate(sub(negate(y), negate(x)));
             }
-                // -x - y = -(x + y)
+            // -x - y = -(x + y)
             else if (x.is_negative and !y.is_negative)
             {
                 return negate(add(negate(x), y));
             }
-                // x - (-y) = x + y
+            // x - (-y) = x + y
             else if (!x.is_negative and y.is_negative)
             {
                 return add(x, negate(y));
