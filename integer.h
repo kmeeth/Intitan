@@ -130,7 +130,7 @@ namespace int_titan
         // A vector of base-2^32 digits (little-endian).
         integer_digits digits;
         // Is the integer negative?
-        bool is_negative;
+        bool is_negative = false;
         // Get a digit from an integer.
         static digit get_digit(const integer& x, const int index)
         {
