@@ -59,7 +59,7 @@ namespace int_titan
             {
                 result.push_back(1);
             }
-            return integer(result.persistent(), false);
+            return create(result.persistent(), false);
         }
         // Sub one integer from the other.
         static integer sub(const integer& x, const integer& y)
@@ -108,7 +108,7 @@ namespace int_titan
             {
                 result.take(result.size() - 1);
             }
-            return integer(result.persistent(), false);
+            return create(result.persistent(), false);
         }
         // Is x less than y?
         static bool is_less_than(const integer& x, const integer& y)
