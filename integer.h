@@ -201,7 +201,7 @@ namespace int_titan
             {
                 return d - '0';
             }
-            return d - 'a';
+            return 10 + d - 'a';
         }
         // An optimized approach to read integers from power of 2 bases.
         static integer_digits digits_from_pow2_base(const std::string_view str, const int base)
