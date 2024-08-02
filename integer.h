@@ -22,6 +22,27 @@ namespace int_titan
             x.is_negative = is_negative;
             return x;
         }
+        // From string representation in a certain base
+        static integer create(std::string_view str, const int base)
+        {
+            bool is_negative = false;
+            if(!str.empty() and (str[0] == '-' or str[0] == '+'))
+            {
+                is_negative = str[0] == '-';
+                str = str.substr(1);
+            }
+            // Currently, only power of 2 bases are supported.
+            assert(is_pow2(base));
+            constexpr int max_base = (1 + '9' - '0') + (1 + 'Z' - 'A'); // Decimal digits + alphabet.
+            assert(base > 1 and base <= max_base);
+            // A more performant approach is available for power of 2 bases.
+            if(is_pow2(base))
+            {
+                return create(digits_from_pow2_base(str, base), is_negative);
+            }
+            // TODO : arbitrary bases
+            throw std::exception();
+        }
         // Negate the integer.
         static integer negate(integer x)
         {
@@ -142,6 +163,69 @@ namespace int_titan
         {
             assert(digit != 0); // 0 does not have an inverse.
             return static_cast<superdigit>(max_digit) + 1 - digit;
+        }
+        // Check if an integer is a power of 2.
+        static bool is_pow2(int x)
+        {
+            if(x == 0)
+            {
+                return false;
+            }
+            while(x > 1)
+            {
+                if(x % 2)
+                {
+                    return false;
+                }
+                x /= 2;
+            }
+            return true;
+        }
+        // Get log2 of an integer that is a power of 2.
+        static int log2_pow2(int x)
+        {
+            assert(is_pow2(x));
+            int count = 0;
+            while(x /= 2)
+            {
+                count++;
+            }
+            return count;
+        }
+        // Get value of a digit character.
+        static int get_digit_character_value(char d)
+        {
+            d = static_cast<char>(std::tolower(d));
+            assert((d >= '0' and d <= '9') or (d >= 'a' and d <= 'z'));
+            if(d >= '0' and d <= '9')
+            {
+                return d - '0';
+            }
+            return d - 'a';
+        }
+        // An optimized approach to read integers from power of 2 bases.
+        static integer_digits digits_from_pow2_base(const std::string_view str, const int base)
+        {
+            assert(is_pow2(base));
+            const int bit_count = log2_pow2(base);
+            const int characters_per_digit = 32 / bit_count; // How many characters in str fill up a base-2^32 digit.
+            auto result = integer_digits().transient();
+            digit current_digit = 0;
+            for(int counter = 0, i = static_cast<int>(str.size() - 1); i >= 0; i--)
+            {
+                const int current_character = get_digit_character_value(str[i]);
+                current_digit |= (current_character << (bit_count * counter));
+                if ((++counter %= characters_per_digit) == 0)
+                {
+                    result.push_back(current_digit);
+                    current_digit = 0;
+                }
+            }
+            if(current_digit != 0)
+            {
+                result.push_back(current_digit);
+            }
+            return result.persistent();
         }
     };
 }
