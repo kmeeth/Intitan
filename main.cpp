@@ -2,11 +2,21 @@
 #include <iostream>
 #include <unordered_map>
 
+using int_titan::integer;
+
 void free_calculator()
 {
     while(true)
     {
-
+        std::cout << "Enter radix:" << std::endl;
+        int radix;
+        std::cin >> radix;
+        std::cout << "Enter two numbers to add:" << std::endl;
+        std::string x, y;
+        std::cin >> x >> y;
+        integer a = integer::create(x, radix);
+        integer b = integer::create(y, radix);
+        integer r = integer::add(a, b);
     }
 }
 
