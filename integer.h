@@ -61,12 +61,12 @@ namespace int_titan
             // -x + y = y - x
             else if(x.is_negative and !y.is_negative)
             {
-                return sub(y, negate(x));
+                return subtract(y, negate(x));
             }
             // x + (-y) = x - y
             else if(!x.is_negative and y.is_negative)
             {
-                return sub(x, negate(y));
+                return subtract(x, negate(y));
             }
             auto result = integer_digits().transient();
             int carry = 0;
@@ -82,20 +82,20 @@ namespace int_titan
             }
             return create(result.persistent(), false);
         }
-        // Sub one integer from the other.
-        static integer sub(const integer& x, const integer& y)
+        // Subtract one integer from the other.
+        static integer subtract(const integer& x, const integer& y)
         {
             // Cover the case where x is less than y.
             // x - y = -(y - x)
             if (is_less_than(x, y))
             {
-                return negate(sub(y, x));
+                return negate(subtract(y, x));
             }
             // Cover the cases for negative numbers.
             // -x - (-y) = y - x
             if (x.is_negative and y.is_negative)
             {
-                return negate(sub(negate(y), negate(x)));
+                return negate(subtract(negate(y), negate(x)));
             }
             // -x - y = -(x + y)
             else if (x.is_negative and !y.is_negative)

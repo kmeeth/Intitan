@@ -16,7 +16,7 @@ void free_calculator()
         std::cin >> x >> y;
         integer a = integer::create(x, radix);
         integer b = integer::create(y, radix);
-        integer r = integer::add(a, b);
+        integer r = integer::subtract(a, b);
     }
 }
 
