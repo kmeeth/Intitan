@@ -3,6 +3,7 @@
 #include <immer/vector.hpp>
 #include <immer/vector_transient.hpp>
 #include <utility>
+#include <sstream>
 
 namespace int_titan
 {
@@ -39,6 +40,20 @@ namespace int_titan
             if(is_pow2(base))
             {
                 return create(digits_from_pow2_base(str, base), is_negative);
+            }
+            // TODO : arbitrary bases
+            throw std::exception();
+        }
+        // Convert integer to string.
+        static std::string to_string(const integer& x, const int base, const bool uppercase = true)
+        {
+            // Currently, only power of 2 bases are supported.
+            assert(is_pow2(base));
+            constexpr int max_base = (1 + '9' - '0') + (1 + 'Z' - 'A'); // Decimal digits + alphabet.
+            assert(base > 1 and base <= max_base);
+            if(is_pow2(base))
+            {
+                return string_from_pow2_base(x, base, uppercase);
             }
             // TODO : arbitrary bases
             throw std::exception();
@@ -203,6 +218,17 @@ namespace int_titan
             }
             return 10 + d - 'a';
         }
+        // Get digit character for value.
+        static char get_digit_character(const int value, const bool uppercase = true)
+        {
+            assert(value < (1 + '9' - '0') + (1 + 'Z' - 'A'));
+            if(value < 10)
+            {
+                return static_cast<char>('0' + value);
+            }
+            char a = uppercase ? 'A' : 'a';
+            return static_cast<char>(a + value - 10);
+        }
         // An optimized approach to read integers from power of 2 bases.
         static integer_digits digits_from_pow2_base(const std::string_view str, const int base)
         {
@@ -226,6 +252,41 @@ namespace int_titan
                 result.push_back(current_digit);
             }
             return result.persistent();
+        }
+        // An optimized approach to output integers with power of 2 bases.
+        static std::string string_from_pow2_base(const integer& x, const int base, const bool uppercase = true)
+        {
+            assert(is_pow2(base));
+            const int bit_count = log2_pow2(base);
+            std::stringstream ss;
+            if(x.is_negative)
+            {
+                ss << '-';
+            }
+            const auto& digits = x.digits;
+            int current_bits = 0;
+            bool has_at_least_one_character = false; // Used to avoid leading zeroes.
+            // Reads the digits from the most significant to the least significant.
+            for(int counter = 0, i = static_cast<int>(digits.size() - 1); i >= 0; i--)
+            {
+                digit current_digit = digits[i];
+                // Reads individual bits from the most significant to the least significant.
+                for(int bit = 31; bit >= 0; bit--)
+                {
+                    bool is_set = !!(current_digit & (1 << bit));
+                    current_bits |= (is_set << (bit_count - 1 - (counter % bit_count)));
+                    if((++counter %= bit_count) == 0)
+                    {
+                        if(has_at_least_one_character or current_bits != 0)
+                        {
+                            ss << get_digit_character(current_bits, uppercase);
+                            has_at_least_one_character = true;
+                            current_bits = 0;
+                        }
+                    }
+                }
+            }
+            return ss.str();
         }
     };
 }
