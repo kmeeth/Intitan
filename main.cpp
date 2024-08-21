@@ -11,7 +11,7 @@ void free_calculator()
         std::cout << "Enter radix:" << std::endl;
         int radix;
         std::cin >> radix;
-        std::cout << "Enter two numbers to subtract:" << std::endl;
+        std::cout << "Enter two numbers to add:" << std::endl;
         std::string x, y;
         std::cin >> x >> y;
         integer a = integer::create(x, radix);
