@@ -265,9 +265,12 @@ namespace int_titan
             }
             const auto& digits = x.digits;
             int current_bits = 0;
-            bool has_at_least_one_character = false; // Used to avoid leading zeroes.
+            // Used to avoid leading zeroes.
+            bool has_at_least_one_character = false;
+            // Accounts for misalignments when the// log2 of base is not a power of 2.
+            int counter = static_cast<int>(digits.size() * 32) % bit_count;
             // Reads the digits from the most significant to the least significant.
-            for(int counter = 0, i = static_cast<int>(digits.size() - 1); i >= 0; i--)
+            for(int i = static_cast<int>(digits.size() - 1); i >= 0; i--)
             {
                 digit current_digit = digits[i];
                 // Reads individual bits from the most significant to the least significant.
