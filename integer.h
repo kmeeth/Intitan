@@ -276,7 +276,7 @@ namespace int_titan
                 // Reads individual bits from the most significant to the least significant.
                 for(int bit = 31; bit >= 0; bit--)
                 {
-                    bool is_set = !!(current_digit & (1 << bit));
+                    const bool is_set = !!(current_digit & (1 << bit));
                     current_bits |= (is_set << (bit_count - 1 - (counter % bit_count)));
                     if((++counter %= bit_count) == 0)
                     {
