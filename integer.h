@@ -230,18 +230,23 @@ namespace int_titan
             return static_cast<char>(a + value - 10);
         }
         // An optimized approach to read integers from power of 2 bases.
+        // From least to most significant, bits that correspond to the digits in str are being streamed into
+        // integer_digits one by one.
         static integer_digits digits_from_pow2_base(const std::string_view str, const int base)
         {
             assert(is_pow2(base));
             const int bit_count = log2_pow2(base);
-            const int characters_per_digit = 32 / bit_count; // How many characters in str fill up a base-2^32 digit.
             auto result = integer_digits().transient();
             digit current_digit = 0;
-            for(int counter = 0, i = static_cast<int>(str.size() - 1); i >= 0; i--)
+            for(int counter = 0; counter < str.size() * bit_count; counter++)
             {
-                const int current_character = get_digit_character_value(str[i]);
-                current_digit |= (current_character << (bit_count * counter));
-                if ((++counter %= characters_per_digit) == 0)
+                const int char_index = counter / bit_count; // Position of the char in str currently considered.
+                const int char_value = get_digit_character_value(str[char_index]); // Numerical value of said char in a given base.
+                const int char_value_bit_index = counter % bit_count; // Which bit of the value is being considered.
+                const bool is_set = !!(char_value & (1 << char_value_bit_index)); // Is the considered bit set?
+                const int digit_bit_index = counter % 32; // Position of the current bit in the current digit.
+                current_digit |= (is_set << digit_bit_index); // Put the bit in the digit.
+                if((counter + 1) % 32 == 0) // If this digit is finished.
                 {
                     result.push_back(current_digit);
                     current_digit = 0;
@@ -250,6 +255,11 @@ namespace int_titan
             if(current_digit != 0)
             {
                 result.push_back(current_digit);
+            }
+            // Avoid leading zeroes.
+            while (!result.empty() and result[result.size() - 1] == 0)
+            {
+                result.take(result.size() - 1);
             }
             return result.persistent();
         }
