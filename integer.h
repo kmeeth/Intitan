@@ -211,7 +211,25 @@ namespace int_titan
         // Read integers from hex strings.
         static integer_digits digits_from_hex_string(const std::string_view str)
         {
-            throw std::exception();
+            const int bits_per_hex_digit = 4; // How many bits are contained in a hex digit.
+            const int characters_per_digit = 32 / bits_per_hex_digit; // How many hex digits in str fill up a base-2^32 digit.
+            auto result = integer_digits().transient();
+            digit current_digit = 0;
+            for(int counter = 0, i = static_cast<int>(str.size() - 1); i >= 0; i--)
+            {
+                const int current_character = get_digit_character_value(str[i]);
+                current_digit |= (current_character << (bits_per_hex_digit * counter));
+                if ((++counter %= characters_per_digit) == 0)
+                {
+                    result.push_back(current_digit);
+                    current_digit = 0;
+                }
+            }
+            if(current_digit != 0)
+            {
+                result.push_back(current_digit);
+            }
+            return result.persistent();
         }
         // Convert integers to hex strings.
         static std::string hex_string_from_integer(const integer& x, const bool uppercase = true)
