@@ -23,8 +23,8 @@ namespace int_titan
             x.is_negative = is_negative;
             return x;
         }
-        // From string representation in a certain base
-        static integer create(std::string_view str, const int base)
+        // From string representation in decimal or hexadecimal.
+        static integer create(std::string_view str, const bool is_hex = true)
         {
             bool is_negative = false;
             if(!str.empty() and (str[0] == '-' or str[0] == '+'))
@@ -32,31 +32,16 @@ namespace int_titan
                 is_negative = str[0] == '-';
                 str = str.substr(1);
             }
-            // Currently, only power of 2 bases are supported.
-            assert(is_pow2(base));
-            constexpr int max_base = (1 + '9' - '0') + (1 + 'Z' - 'A'); // Decimal digits + alphabet.
-            assert(base > 1 and base <= max_base);
-            // A more performant approach is available for power of 2 bases.
-            if(is_pow2(base))
-            {
-                return create(digits_from_pow2_base(str, base), is_negative);
-            }
-            // TODO : arbitrary bases
-            throw std::exception();
+            // Currently, only hex is supported.
+            assert(is_hex);
+            return create(digits_from_string(str, is_hex), is_negative);
         }
         // Convert integer to string.
-        static std::string to_string(const integer& x, const int base, const bool uppercase = true)
+        static std::string to_string(const integer& x, const bool is_hex = true, const bool uppercase = true)
         {
-            // Currently, only power of 2 bases are supported.
-            assert(is_pow2(base));
-            constexpr int max_base = (1 + '9' - '0') + (1 + 'Z' - 'A'); // Decimal digits + alphabet.
-            assert(base > 1 and base <= max_base);
-            if(is_pow2(base))
-            {
-                return string_from_pow2_base(x, base, uppercase);
-            }
-            // TODO : arbitrary bases
-            throw std::exception();
+            // Currently, only hex is supported.
+            assert(is_hex);
+            return string_from_integer(x, is_hex, uppercase);
         }
         // Negate the integer.
         static integer negate(integer x)
@@ -179,35 +164,7 @@ namespace int_titan
             assert(digit != 0); // 0 does not have an inverse.
             return static_cast<superdigit>(max_digit) + 1 - digit;
         }
-        // Check if an integer is a power of 2.
-        static bool is_pow2(int x)
-        {
-            if(x == 0)
-            {
-                return false;
-            }
-            while(x > 1)
-            {
-                if(x % 2)
-                {
-                    return false;
-                }
-                x /= 2;
-            }
-            return true;
-        }
-        // Get log2 of an integer that is a power of 2.
-        static int log2_pow2(int x)
-        {
-            assert(is_pow2(x));
-            int count = 0;
-            while(x /= 2)
-            {
-                count++;
-            }
-            return count;
-        }
-        // Get value of a digit character.
+        // Get value of a digit character (e.g. value of '0' is 0, value of 'D' is 13).
         static int get_digit_character_value(char d)
         {
             d = static_cast<char>(std::tolower(d));
@@ -229,77 +186,37 @@ namespace int_titan
             char a = uppercase ? 'A' : 'a';
             return static_cast<char>(a + value - 10);
         }
-        // An optimized approach to read integers from power of 2 bases.
-        // From least to most significant, bits that correspond to the digits in str are being streamed into
-        // integer_digits one by one.
-        static integer_digits digits_from_pow2_base(const std::string_view str, const int base)
+        // Read integers from strings (decimal and hex).
+        static integer_digits digits_from_string(const std::string_view str, const bool is_hex)
         {
-            assert(is_pow2(base));
-            const int bit_count = log2_pow2(base);
-            auto result = integer_digits().transient();
-            digit current_digit = 0;
-            for(int counter = 0; counter < str.size() * bit_count; counter++)
+            // Only hex is currently supported.
+            assert(is_hex);
+            if(is_hex)
             {
-                const int char_index = counter / bit_count; // Position of the char in str currently considered.
-                const int char_value = get_digit_character_value(str[char_index]); // Numerical value of said char in a given base.
-                const int char_value_bit_index = counter % bit_count; // Which bit of the value is being considered.
-                const bool is_set = !!(char_value & (1 << char_value_bit_index)); // Is the considered bit set?
-                const int digit_bit_index = counter % 32; // Position of the current bit in the current digit.
-                current_digit |= (is_set << digit_bit_index); // Put the bit in the digit.
-                if((counter + 1) % 32 == 0) // If this digit is finished.
-                {
-                    result.push_back(current_digit);
-                    current_digit = 0;
-                }
+                return digits_from_hex_string(str);
             }
-            if(current_digit != 0)
-            {
-                result.push_back(current_digit);
-            }
-            // Avoid leading zeroes.
-            while (!result.empty() and result[result.size() - 1] == 0)
-            {
-                result.take(result.size() - 1);
-            }
-            return result.persistent();
+            throw std::exception();
         }
-        // An optimized approach to output integers with power of 2 bases.
-        static std::string string_from_pow2_base(const integer& x, const int base, const bool uppercase = true)
+        // Convert integers to strings (decimal and hex).
+        static std::string string_from_integer(const integer& x, const bool is_hex = true, const bool uppercase = true)
         {
-            assert(is_pow2(base));
-            const int bit_count = log2_pow2(base);
-            std::stringstream ss;
-            if(x.is_negative)
+            // Only hex is currently supported.
+            assert(is_hex);
+            if(is_hex)
             {
-                ss << '-';
+                return hex_string_from_integer(x, uppercase);
             }
-            const auto& digits = x.digits;
-            int current_bits = 0;
-            // Used to avoid leading zeroes.
-            bool has_at_least_one_character = false;
-            // Accounts for misalignments when the log2 of base is not a power of 2.
-            int counter = static_cast<int>(digits.size() * 32) % bit_count;
-            // Reads the digits from the most significant to the least significant.
-            for(int i = static_cast<int>(digits.size() - 1); i >= 0; i--)
-            {
-                digit current_digit = digits[i];
-                // Reads individual bits from the most significant to the least significant.
-                for(int bit = 31; bit >= 0; bit--)
-                {
-                    const bool is_set = !!(current_digit & (1 << bit));
-                    current_bits |= (is_set << (bit_count - 1 - (counter % bit_count)));
-                    if((++counter %= bit_count) == 0)
-                    {
-                        if(has_at_least_one_character or current_bits != 0)
-                        {
-                            ss << get_digit_character(current_bits, uppercase);
-                            has_at_least_one_character = true;
-                            current_bits = 0;
-                        }
-                    }
-                }
-            }
-            return ss.str();
+            throw std::exception();
+        }
+        // Read integers from hex strings.
+        static integer_digits digits_from_hex_string(const std::string_view str)
+        {
+            throw std::exception();
+        }
+        // Convert integers to hex strings.
+        static std::string hex_string_from_integer(const integer& x, const bool uppercase = true)
+        {
+            throw std::exception();
         }
     };
 }
