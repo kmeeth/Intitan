@@ -234,7 +234,36 @@ namespace int_titan
         // Convert integers to hex strings.
         static std::string hex_string_from_integer(const integer& x, const bool uppercase = true)
         {
-            throw std::exception();
+            const int bits_per_hex_digit = 4; // How many bits are contained in a hex digit.
+            std::stringstream ss;
+            if(x.is_negative)
+            {
+                ss << '-';
+            }
+            const auto& digits = x.digits;
+            int current_bits = 0;
+            bool has_at_least_one_character = false; // Used to avoid leading zeroes.
+            // Reads the digits from the most significant to the least significant.
+            for(int counter = 0, i = static_cast<int>(digits.size() - 1); i >= 0; i--)
+            {
+                digit current_digit = digits[i];
+                // Reads individual bits from the most significant to the least significant.
+                for(int bit = 31; bit >= 0; bit--)
+                {
+                    bool is_set = !!(current_digit & (1 << bit));
+                    current_bits |= (is_set << (bits_per_hex_digit - 1 - (counter % bits_per_hex_digit)));
+                    if((++counter %= bits_per_hex_digit) == 0)
+                    {
+                        if(has_at_least_one_character or current_bits != 0)
+                        {
+                            ss << get_digit_character(current_bits, uppercase);
+                            has_at_least_one_character = true;
+                            current_bits = 0;
+                        }
+                    }
+                }
+            }
+            return ss.str();
         }
     };
 }
