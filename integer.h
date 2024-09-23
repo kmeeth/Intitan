@@ -2,6 +2,8 @@
 #define INTTITAN_INTEGER_H
 #include <immer/vector.hpp>
 #include <immer/vector_transient.hpp>
+#include <immer/flex_vector.hpp>
+#include <immer/flex_vector_transient.hpp>
 #include <utility>
 #include <sstream>
 
@@ -14,7 +16,7 @@ namespace int_titan
         using digit = uint32_t;
         using superdigit = uint64_t;
         static constexpr digit max_digit = std::numeric_limits<digit>::max();
-        using integer_digits = immer::vector<digit>;
+        using integer_digits = immer::flex_vector<digit>;
         // From base 2^32 digits (native representation).
         static integer create(const integer_digits& digits, const bool is_negative)
         {
