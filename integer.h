@@ -133,6 +133,20 @@ namespace int_titan
             }
             return create(result.persistent(), false);
         }
+        // Shift left (multiply by 10^amount, base 2^32), basically adding 'amount' zeroes.
+        static integer shift_left(integer x, const int amount)
+        {
+            for(int i = 0; i < amount; i++)
+            {
+                x.digits = x.digits.push_front(0);
+            }
+            return create(x.digits.push_front(0), x.is_negative);
+        }
+        // Shift right (divide by 10^amount, base 2^32), basically removing 'amount' digits from the right.
+        static integer shift_right(const integer& x, const int amount)
+        {
+            return create(x.digits.drop(amount), x.is_negative);
+        }
         // Is x less than y?
         static bool is_less_than(const integer& x, const integer& y)
         {
