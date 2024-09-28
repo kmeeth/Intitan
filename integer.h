@@ -149,6 +149,21 @@ namespace int_titan
         {
             return create(x.digits.drop(amount), x.is_negative);
         }
+        // Multiply two integers.
+        static integer multiply(const integer& x, const integer& y)
+        {
+            if(y.digits.size() > x.digits.size())
+            {
+                // It is somewhat more performant to have the smaller number on the right.
+                return multiply(y, x);
+            }
+            integer result = zero;
+            for(int i = 0; i < y.digits.size(); i++)
+            {
+                result = add(result, shift_left(y, i));
+            }
+            return result;
+        }
         // Is x less than y?
         static bool is_less_than(const integer& x, const integer& y)
         {
@@ -282,6 +297,20 @@ namespace int_titan
                 }
             }
             return ss.str();
+        }
+        // Multiplication of base 2^32 digits.
+        static integer multiply_digits(const digit x, const digit y)
+        {
+            const superdigit p = x * y;
+            if(p == 0) // Result is 0.
+            {
+                return zero;
+            }
+            else if((p >> 32) == 0) // Result is less than 2^32.
+            {
+                return create({static_cast<digit>(p)}, false);
+            }
+            return create({static_cast<digit>(p >> 32), static_cast<digit>((p << 32) >> 32)}, false);
         }
     };
 }
