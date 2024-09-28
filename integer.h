@@ -38,6 +38,8 @@ namespace int_titan
             assert(is_hex);
             return create(digits_from_string(str, is_hex), is_negative);
         }
+        // Zero value.
+        static const integer zero;
         // Convert integer to string.
         static std::string to_string(const integer& x, const bool is_hex = true, const bool uppercase = true)
         {
@@ -283,5 +285,7 @@ namespace int_titan
         }
     };
 }
+
+const int_titan::integer int_titan::integer::zero = int_titan::integer::create(integer_digits(), false);
 
 #endif //INTTITAN_INTEGER_H
