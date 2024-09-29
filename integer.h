@@ -53,6 +53,12 @@ namespace int_titan
             x.is_negative = !x.is_negative;
             return x;
         }
+        // Absolute value.
+        static integer absolute_value(integer x)
+        {
+            x.is_negative = false;
+            return x;
+        }
         // Add the two integers.
         static integer add(const integer& x, const integer& y)
         {
