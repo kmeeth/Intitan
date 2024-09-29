@@ -191,6 +191,15 @@ namespace int_titan
             }
             return false;
         }
+        // Are x and y equal?
+        static bool is_equal_to(const integer& x, const integer& y)
+        {
+            if(x.digits.empty() and y.digits.empty())
+            {
+                return true; // Both zero (if a negative zero arises, treat it the same as positive).
+            }
+            return x.is_negative == y.is_negative and x.digits == y.digits;
+        }
     private:
         // A vector of base-2^32 digits (little-endian).
         integer_digits digits;
