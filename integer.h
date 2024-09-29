@@ -319,18 +319,27 @@ namespace int_titan
             return ss.str();
         }
         // Multiplication of base 2^32 digits.
-        static integer multiply_digits(const digit x, const digit y)
+        static superdigit multiply_digits(const digit x, const digit y)
         {
             const superdigit p = x * y;
-            if(p == 0) // Result is 0.
+            return p;
+        }
+        // Multiplication of an integer with a base 2^32 digit.
+        static integer multiply_integer_by_digit(const integer& x, const digit d)
+        {
+            digit carry = 0;
+            auto result = integer_digits().transient();
+            for(int i = 0; i < x.digits.size(); i++)
             {
-                return zero;
+                const superdigit product = multiply_digits(get_digit(x, i), d) + carry;
+                result.push_back((product << 32) >> 32);
+                carry = (product >> 32);
             }
-            else if((p >> 32) == 0) // Result is less than 2^32.
+            if(carry != 0)
             {
-                return create({static_cast<digit>(p)}, false);
+                result.push_back(carry);
             }
-            return create({static_cast<digit>(p >> 32), static_cast<digit>((p << 32) >> 32)}, false);
+            return create(result.persistent(), x.is_negative);
         }
     };
 }
