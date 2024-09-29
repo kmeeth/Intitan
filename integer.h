@@ -156,18 +156,23 @@ namespace int_titan
             return create(x.digits.drop(amount), x.is_negative);
         }
         // Multiply two integers.
-        static integer multiply(const integer& x, const integer& y)
+        static integer multiply(integer x, integer y)
         {
             if(y.digits.size() > x.digits.size())
             {
                 // It is somewhat more performant to have the smaller number on the right.
                 return multiply(y, x);
             }
+            const bool is_negative = x.is_negative xor y.is_negative;
+            x.is_negative = y.is_negative = false;
             integer result = zero;
+            // Multiply x with each digit of y, shifting according to the position of the digit.
             for(int i = 0; i < y.digits.size(); i++)
             {
-                result = add(result, shift_left(y, i));
+                integer product_by_digit = multiply_integer_by_digit(x, y.digits[i]);
+                result = add(result, shift_left(product_by_digit, i));
             }
+            result.is_negative = is_negative;
             return result;
         }
         // Is x less than y?
