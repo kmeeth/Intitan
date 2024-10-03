@@ -179,6 +179,35 @@ namespace int_titan
             result.is_negative = is_negative;
             return result;
         }
+        // Divide two integers (returns <result, remainder>).
+        static std::pair<integer, integer> divide(integer x, integer y)
+        {
+            if(is_equal_to(y, zero))
+            {
+                throw std::logic_error("Division by 0 impermissible.");
+            }
+            if(is_less_than(x, y))
+            {
+                return {zero, x};
+            }
+            const bool is_negative = x.is_negative xor y.is_negative;
+            x.is_negative = y.is_negative = false;
+            // Long division.
+            integer carry = zero;
+            integer result = zero;
+            for(int i = static_cast<int>(x.digits.size()); i >= 0; i--)
+            {
+                carry.digits = carry.digits.push_front(get_digit(x, i));
+                digit new_digit = small_divide(carry, y);
+                if(!result.digits.empty() or new_digit != 0)
+                {
+                    result.digits = result.digits.push_front(new_digit);
+                }
+                carry = subtract(carry, multiply_integer_by_digit(y, new_digit));
+            }
+            result.is_negative = carry.is_negative = is_negative;
+            return {result, carry};
+        }
         // Is x less than y?
         static bool is_less_than(const integer& x, const integer& y)
         {
@@ -361,6 +390,12 @@ namespace int_titan
                 result.push_back(carry);
             }
             return create(result.persistent(), x.is_negative);
+        }
+        // Division of an integer with an integer that we know will result in a digit.
+        // TODO: Currently unimplemented.
+        static digit small_divide(const integer& x, const integer& y)
+        {
+            return 0;
         }
     };
 }
