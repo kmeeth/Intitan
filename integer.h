@@ -392,10 +392,23 @@ namespace int_titan
             return create(result.persistent(), x.is_negative);
         }
         // Division of an integer with an integer that we know will result in a digit.
-        // TODO: Currently unimplemented.
         static digit small_divide(const integer& x, const integer& y)
         {
-            return 0;
+            // Common case, should be checked first.
+            if(is_less_than(x, y))
+            {
+                return 0;
+            }
+            // For each bit in the resulting digit, check in descending order whether each one of them being set overshoots the solution.
+            digit cur = 0;
+            for(int i = 31; i >= 0; i--)
+            {
+                if(is_less_than(x, multiply_integer_by_digit(y, cur | (1 << i))))
+                {
+                    cur |= (1 << i);
+                }
+            }
+            return cur;
         }
     };
 }
