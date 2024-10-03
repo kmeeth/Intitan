@@ -178,6 +178,23 @@ namespace int_titan
         // Is x less than y?
         static bool is_less_than(const integer& x, const integer& y)
         {
+            // If both are zero.
+            if(is_equal_to(x, zero) and is_equal_to(y, zero))
+            {
+                return false;
+            }
+            // If unequal signs.
+            if(x.is_negative != y.is_negative)
+            {
+                return x.is_negative;
+            }
+            // If both negative.
+            if(x.is_negative and y.is_negative)
+            {
+                return !is_less_than(negate(y), negate(x));
+            }
+
+            // Compare digits one by one.
             if(x.digits.size() != y.digits.size())
             {
                 return x.digits.size() < y.digits.size();
