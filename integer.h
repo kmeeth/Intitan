@@ -144,6 +144,10 @@ namespace int_titan
         // Shift left (multiply by 10^amount, base 2^32), basically adding 'amount' zeroes.
         static integer shift_left(integer x, const int amount)
         {
+            if(is_equal_to(x, zero))
+            {
+                return x;
+            }
             for(int i = 0; i < amount; i++)
             {
                 x.digits = x.digits.push_front(0);
