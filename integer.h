@@ -195,7 +195,7 @@ namespace int_titan
             // Long division.
             integer carry = zero;
             integer result = zero;
-            for(int i = static_cast<int>(x.digits.size()); i >= 0; i--)
+            for(int i = static_cast<int>(x.digits.size() - 1); i >= 0; i--)
             {
                 carry.digits = carry.digits.push_front(get_digit(x, i));
                 digit new_digit = small_divide(carry, y);
