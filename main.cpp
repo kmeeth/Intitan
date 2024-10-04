@@ -9,9 +9,8 @@ void free_calculator()
 {
     while(true)
     {
-        std::cout << "Enter radix:" << std::endl;
-        int radix;
-        std::cin >> radix;
+        std::cout << "Radix = 16" << std::endl;
+        int radix = 16; // Currently, only hex is supported.
         std::cout << "Enter the expression (end with '='):" << std::endl;
         std::string expression;
         std::cin.ignore();
@@ -40,7 +39,7 @@ void free_calculator()
             integer sum = integer::create("0", radix);
             for(int i = 0; i < terms.size(); i++)
             {
-                integer num = integer::create(terms[i], radix);
+                integer num = integer::create(terms[i], radix == 16);
                 if(operations[i] == '-')
                 {
                     num = integer::negate(num);
