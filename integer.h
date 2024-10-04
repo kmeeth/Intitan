@@ -371,7 +371,7 @@ namespace int_titan
         // Multiplication of base 2^32 digits.
         static superdigit multiply_digits(const digit x, const digit y)
         {
-            const superdigit p = x * y;
+            const superdigit p = static_cast<superdigit>(x) * static_cast<superdigit>(y);
             return p;
         }
         // Multiplication of an integer with a base 2^32 digit.
