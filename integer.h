@@ -152,7 +152,7 @@ namespace int_titan
             {
                 x.digits = x.digits.push_front(0);
             }
-            return create(x.digits.push_front(0), x.is_negative);
+            return x;
         }
         // Shift right (divide by 10^amount, base 2^32), basically removing 'amount' digits from the right.
         static integer shift_right(const integer& x, const int amount)
