@@ -382,7 +382,10 @@ namespace int_titan
             for(int i = 0; i < x.digits.size(); i++)
             {
                 const superdigit product = multiply_digits(get_digit(x, i), d) + carry;
-                result.push_back((product << 32) >> 32);
+                if(!result.empty() or ((product << 32) >> 32) > 0)
+                {
+                    result.push_back((product << 32) >> 32);
+                }
                 carry = (product >> 32);
             }
             if(carry != 0)
