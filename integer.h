@@ -382,15 +382,17 @@ namespace int_titan
             for(int i = 0; i < x.digits.size(); i++)
             {
                 const superdigit product = multiply_digits(get_digit(x, i), d) + carry;
-                if(!result.empty() or ((product << 32) >> 32) > 0)
-                {
-                    result.push_back((product << 32) >> 32);
-                }
+                result.push_back((product << 32) >> 32);
                 carry = (product >> 32);
             }
             if(carry != 0)
             {
                 result.push_back(carry);
+            }
+            // Remove leading 0s.
+            while (!result.empty() and result[result.size() - 1] == 0)
+            {
+                result.take(result.size() - 1);
             }
             return create(result.persistent(), x.is_negative);
         }
