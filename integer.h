@@ -403,7 +403,7 @@ namespace int_titan
             digit cur = 0;
             for(int i = 31; i >= 0; i--)
             {
-                if(is_less_than(x, multiply_integer_by_digit(y, cur | (1 << i))))
+                if(!is_less_than(x, multiply_integer_by_digit(y, cur | (1 << i))))
                 {
                     cur |= (1 << i);
                 }
