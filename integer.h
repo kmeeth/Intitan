@@ -252,6 +252,109 @@ namespace int_titan
             }
             return x.is_negative == y.is_negative and x.digits == y.digits;
         }
+
+        // Operator functions.
+        // Comparison.
+        friend bool operator==(const integer& x, const integer& y)
+        {
+            return is_equal_to(x, y);
+        }
+        friend bool operator!=(const integer& x, const integer& y)
+        {
+            return !is_equal_to(x, y);
+        }
+        friend bool operator<(const integer& x, const integer& y)
+        {
+            return is_less_than(x, y);
+        }
+        friend bool operator<=(const integer& x, const integer& y)
+        {
+            return is_less_than(x, y);
+        }
+        friend bool operator>(const integer& x, const integer& y)
+        {
+            return is_less_than(x, y);
+        }
+        friend bool operator>=(const integer& x, const integer& y)
+        {
+            return is_less_than(x, y);
+        }
+        // Arithmetic.
+        friend integer operator+(const integer& x, const integer& y)
+        {
+            return add(x, y);
+        }
+        friend integer operator+(const integer& x)
+        {
+            return x;
+        }
+        friend integer& operator+=(integer& x, const integer& y)
+        {
+            x = add(x, y);
+            return x;
+        }
+        friend integer& operator++(integer& x)
+        {
+            x = add(x, one);
+            return x;
+        }
+        friend integer operator++(integer& x, int)
+        {
+            integer old = x;
+            x = add(x, one);
+            return old;
+        }
+        friend integer operator-(const integer& x, const integer& y)
+        {
+            return subtract(x, y);
+        }
+        friend integer operator-(const integer& x)
+        {
+            return negate(x);
+        }
+        friend integer& operator-=(integer& x, const integer& y)
+        {
+            x = subtract(x, y);
+            return x;
+        }
+        friend integer& operator--(integer& x)
+        {
+            x = subtract(x, one);
+            return x;
+        }
+        friend integer operator--(integer& x, int)
+        {
+            integer old = x;
+            x = subtract(x, one);
+            return old;
+        }
+        friend integer operator*(const integer& x, const integer& y)
+        {
+            return multiply(x, y);
+        }
+        friend integer& operator*=(integer& x, const integer& y)
+        {
+            x = multiply(x, y);
+            return x;
+        }
+        friend integer operator/(const integer& x, const integer& y)
+        {
+            return divide(x, y).first;
+        }
+        friend integer& operator/=(integer& x, const integer& y)
+        {
+            x = divide(x, y).first;
+            return x;
+        }
+        friend integer operator%(const integer& x, const integer& y)
+        {
+            return divide(x, y).second;
+        }
+        friend integer& operator%=(integer& x, const integer& y)
+        {
+            x = divide(x, y).second;
+            return x;
+        }
     private:
         // A vector of base-2^32 digits (little-endian).
         integer_digits digits;
