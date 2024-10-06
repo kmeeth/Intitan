@@ -421,5 +421,6 @@ namespace int_titan
 }
 
 const int_titan::integer int_titan::integer::zero = int_titan::integer::create(integer_digits(), false);
+const int_titan::integer int_titan::integer::one = int_titan::integer::create(integer_digits({1}), false);
 
 #endif //INTTITAN_INTEGER_H
