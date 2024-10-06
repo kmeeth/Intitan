@@ -355,6 +355,24 @@ namespace int_titan
             x = divide(x, y).second;
             return x;
         }
+        friend integer operator<<(const integer& x, const int amount)
+        {
+            return shift_left(x, amount);
+        }
+        friend integer& operator<<=(integer& x, const int amount)
+        {
+            x = shift_left(x, amount);
+            return x;
+        }
+        friend integer operator>>(const integer& x, const int amount)
+        {
+            return shift_right(x, amount);
+        }
+        friend integer& operator>>=(integer& x, const int amount)
+        {
+            x = shift_right(x, amount);
+            return x;
+        }
     private:
         // A vector of base-2^32 digits (little-endian).
         integer_digits digits;
