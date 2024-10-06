@@ -210,8 +210,8 @@ namespace int_titan
             result.is_negative = carry.is_negative = is_negative;
             return {result, carry};
         }
-        // Is x less than y?
-        static bool is_less_than(const integer& x, const integer& y)
+        // Is x less than y? (strict indicates strict inequality).
+        static bool is_less_than(const integer& x, const integer& y, const bool strict = true)
         {
             // If both are zero.
             if(is_equal_to(x, zero) and is_equal_to(y, zero))
@@ -241,7 +241,7 @@ namespace int_titan
                     return get_digit(x, i) < get_digit(y, i);
                 }
             }
-            return false;
+            return !strict;
         }
         // Are x and y equal?
         static bool is_equal_to(const integer& x, const integer& y)
