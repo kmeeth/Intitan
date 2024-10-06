@@ -40,6 +40,8 @@ namespace int_titan
         }
         // Zero value.
         static const integer zero;
+        // Unit value.
+        static const integer one;
         // Convert integer to string.
         static std::string to_string(const integer& x, const bool is_hex = true, const bool uppercase = true)
         {
